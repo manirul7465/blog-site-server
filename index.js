@@ -134,7 +134,7 @@ async function run() {
       console.log(user, "put");
       const filter = { email: user.email };
       const updateDoc = { $set: { role: "admin" } };
-      const result = await usersCollection.updateOne(filter, updateDoc);
+      const result = await collectionUser.updateOne(filter, updateDoc);
       console.log(result);
       res.json(result);
     });
@@ -142,7 +142,7 @@ async function run() {
     app.get('/users/:email', async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
-     const user = await usersCollection.findOne(query);
+     const user = await collectionUser.findOne(query);
      console.log(user);
      let isAdmin = false;
      if (user?.role === 'admin') {
