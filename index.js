@@ -127,6 +127,29 @@ async function run() {
       const result = await blogCollection.deleteOne(query);
       res.json(result);
     });
+
+     //admin
+     app.put("/users/admin", async (req, res) => {
+      const user = req.body;
+      console.log(user, "put");
+      const filter = { email: user.email };
+      const updateDoc = { $set: { role: "admin" } };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      console.log(result);
+      res.json(result);
+    });
+    //verify admin
+    app.get('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+     const user = await usersCollection.findOne(query);
+     console.log(user);
+     let isAdmin = false;
+     if (user?.role === 'admin') {
+          isAdmin = true;
+      }
+     res.json({ admin: isAdmin });
+   });
   } finally {
     //await client.close()
   }
