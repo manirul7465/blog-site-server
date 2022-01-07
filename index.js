@@ -29,7 +29,52 @@ async function run() {
     console.log("connected to database");
     const database = client.db("blog");
 
+    const collectionUser = database.collection("users");
     const blogCollection = database.collection("blog");
+    const collectionComments = database.collection("comments");
+
+    /* ==================== CRUD Method start ====================== */
+
+    //collection a new user when register
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await collectionUser.insertOne(user);
+      res.json(result);
+    });
+
+    //store user when login or google login
+    app.put("/users", async (req, res) => {
+      const user = req.body;
+      const filter = { email: user.email };
+      const options = { upsert: true };
+      const UserDoc = {
+        $set: user,
+      };
+      const result = await collectionUser.updateOne(filter, UserDoc, options);
+      res.json(result);
+    });
+
+    // Get a single user
+    app.get("/users/:email", async (req, res) => {
+      const userEmail = req.params.email;
+      const query = { email: userEmail };
+      const userInfo = await collectionUser.findOne(query);
+      res.send(userInfo);
+    });
+
+    //post a new comments
+    app.post("/comments", async (req, res) => {
+      const comment = req.body;
+      const result = await collectionComments.insertOne(comment);
+      res.json(result);
+    });
+
+    // get all comments 
+    app.get('/comments', async (req, res) => {
+      const result = await collectionComments.find({}).toArray();
+      res.send(result);
+  });
+
     //add blog
     app.post("/blog", async (req, res) => {
       console.log(req.body);
@@ -66,6 +111,15 @@ async function run() {
       const order = await cursor.toArray();
       res.send(order);
     });
+
+    //find a single blog using id
+    app.get('/blogDetails/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await blogCollection.findOne(filter);
+      res.send(result);
+  });
+
     //delete
     app.delete("/blog/:id", async (req, res) => {
       const id = req.params.id;
