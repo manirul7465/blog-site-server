@@ -65,7 +65,7 @@ async function run() {
     });
     //verify admin
     app.get("/users/:email", async (req, res) => {
-      const email = req.params.email;
+      const userEmail = req.params.email;
       const query = { email: userEmail };
       console.log(query);
       const user = await collectionUser.findOne(query);
