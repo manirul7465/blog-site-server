@@ -53,6 +53,29 @@ async function run() {
       const result = await collectionUser.updateOne(filter, UserDoc, options);
       res.json(result);
     });
+    //admin
+    app.put("/users/admin", async (req, res) => {
+      const user = req.body;
+      console.log(user, "put");
+      const filter = { email: user.email };
+      const updateDoc = { $set: { role: "admin" } };
+      const result = await collectionUser.updateOne(filter, updateDoc);
+      console.log(result);
+      res.json(result);
+    });
+    //verify admin
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: userEmail };
+      console.log(query);
+      const user = await collectionUser.findOne(query);
+      console.log(user);
+      let isAdmin = false;
+      if (user?.role === "admin") {
+        isAdmin = true;
+      }
+      res.json({ admin: isAdmin });
+    });
 
     // Get a single user
     app.get("/users/:email", async (req, res) => {
@@ -69,11 +92,11 @@ async function run() {
       res.json(result);
     });
 
-    // get all comments 
-    app.get('/comments', async (req, res) => {
+    // get all comments
+    app.get("/comments", async (req, res) => {
       const result = await collectionComments.find({}).toArray();
       res.send(result);
-  });
+    });
 
     //add blog
     app.post("/blog", async (req, res) => {
@@ -113,12 +136,12 @@ async function run() {
     });
 
     //find a single blog using id
-    app.get('/blogDetails/:id', async (req, res) => {
+    app.get("/blogDetails/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const result = await blogCollection.findOne(filter);
       res.send(result);
-  });
+    });
 
     //delete
     app.delete("/blog/:id", async (req, res) => {
@@ -127,29 +150,6 @@ async function run() {
       const result = await blogCollection.deleteOne(query);
       res.json(result);
     });
-
-     //admin
-     app.put("/users/admin", async (req, res) => {
-      const user = req.body;
-      console.log(user, "put");
-      const filter = { email: user.email };
-      const updateDoc = { $set: { role: "admin" } };
-      const result = await collectionUser.updateOne(filter, updateDoc);
-      console.log(result);
-      res.json(result);
-    });
-    //verify admin
-    app.get('/users/:email', async (req, res) => {
-      const email = req.params.email;
-      const query = { email: email };
-     const user = await collectionUser.findOne(query);
-     console.log(user);
-     let isAdmin = false;
-     if (user?.role === 'admin') {
-          isAdmin = true;
-      }
-     res.json({ admin: isAdmin });
-   });
   } finally {
     //await client.close()
   }
